@@ -1,0 +1,106 @@
+local a1 = game:GetService("Players")
+local a2 = game:GetService("UserInputService")
+local a3 = workspace.CurrentCamera
+local a4 = a1.LocalPlayer
+
+local function f1(x, y)
+    return (x * y + y) % 97
+end
+
+local f4 = 0.89
+local al = 643
+local fke = 3456
+local maxdist = 500
+local b1 = 0.05
+local b2 = 75
+local srength = 0.00006
+local b3 = 50
+local b4 = Vector2.new(a3.ViewportSize.X / 2, a3.ViewportSize.Y / 2)
+
+local function h1(p)
+    local c1 = p.Character or p.CharacterAdded:Wait()
+    if c1:FindFirstChild("HighlightEffect") then return end
+    local h2 = Instance.new("Highlight")
+    h2.Name = "HighlightEffect"
+    h2.FillTransparency = f1(1, 3)  -- Randomized transparency
+    h2.OutlineTransparency = f1(0, 2)
+    h2.OutlineColor = Color3.fromRGB(f1(255, 1), f1(0, 1), f1(255, 0))  -- Random color
+    h2.Parent = c1
+    h2.Adornee = c1
+end
+
+local function f2()
+    local p1 = nil
+    local p2 = b2
+
+    for _, v in ipairs(a1:GetPlayers()) do
+        if v ~= a4 and v.Character then
+            local c1 = v.Character
+            local c2 = c1:FindFirstChild("HumanoidRootPart") or c1:FindFirstChild("UpperTorso")
+            if c2 then
+                local s1, s2 = a3:WorldToScreenPoint(c2.Position)
+                if s2 then
+                    local d1 = (Vector2.new(s1.X, s1.Y) - b4).Magnitude
+                    if d1 < p2 then
+                        p2 = d1
+                        p1 = v
+                    end
+                end
+            end
+        end
+    end
+    return p1
+end
+
+local function f3()
+    local p1 = f2()
+    if p1 then
+        local c1 = p1.Character
+        local c2 = c1:FindFirstChild("HumanoidRootPart") or c1:FindFirstChild("UpperTorso")
+        if c2 then
+            local t1 = c2.Position
+            local c3 = a3.CFrame
+            local c4 = c3.Position
+            local t2 = (t1 - c4).unit
+
+            local c5 = c3 + t2 * b1
+            a3.CFrame = CFrame.new(c4, c5.Position)
+        end
+    end
+end
+
+local function r1()
+    local m1 = a2:GetMouseLocation()
+    local l1 = b4.X - b3 / 2
+    local l2 = b4.Y - b3 / 2
+    local r1 = b4.X + b3 / 2
+    local r2 = b4.Y + b3 / 2
+
+    if m1.X >= l1 and m1.X <= r1 and m1.Y >= l2 and m1.Y <= r2 then
+        f3()
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    for _, p in ipairs(a1:GetPlayers()) do
+        if p ~= a4 and p.Character and not p.Character:FindFirstChild("HighlightEffect") then
+            h1(p)
+        end
+    end
+    r1()
+end)
+
+a1.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Connect(function(c)
+        if p ~= a4 then
+            h1(p)
+        end
+    end)
+end)
+
+a1.PlayerRemoving:Connect(function(p)
+    local c = p.Character
+    if c and c:FindFirstChild("HighlightEffect") then
+        c.HighlightEffect:Destroy()
+    end
+end)
