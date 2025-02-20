@@ -1,0 +1,50 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+local WinsFolder = workspace:WaitForChild("Wins") -- Folder containing the parts
+local WinParts = WinsFolder:GetChildren() -- Get all the parts inside
+
+-- Sort parts in a specific order (modify sorting logic as needed)
+table.sort(WinParts, function(a, b)
+    return a.Name < b.Name -- Sorts alphabetically by name (Modify as needed)
+end)
+
+-- Create GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 150, 0, 200) -- Smaller size
+Frame.Position = UDim2.new(0, 10, 1, -210) -- Positioned at bottom-left
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BackgroundTransparency = 0.3
+Frame.BorderSizePixel = 2
+Frame.Parent = ScreenGui
+Frame.Draggable = true
+Frame.Active = true
+
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #WinParts * 40)
+ScrollingFrame.ScrollBarThickness = 5
+ScrollingFrame.Parent = Frame
+
+-- Create buttons for each part
+for i, part in ipairs(WinParts) do
+    if part:IsA("BasePart") then
+        local Button = Instance.new("TextButton")
+        Button.Size = UDim2.new(1, -10, 0, 30)
+        Button.Position = UDim2.new(0, 5, 0, (i - 1) * 40)
+        Button.Text = part.Name
+        Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Button.Parent = ScrollingFrame
+
+        -- Button click event to teleport player
+        Button.MouseButton1Click:Connect(function()
+            HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 5, 0) -- Teleports above the part
+        end)
+    end
+end
