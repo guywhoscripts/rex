@@ -1,0 +1,78 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TeleportGUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main Frame (Right Side)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 400)
+frame.Position = UDim2.new(1, -310, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 2
+frame.BorderColor3 = Color3.fromRGB(255, 0, 0)
+frame.Parent = screenGui
+
+-- Tab Selection
+local tabFrame = Instance.new("Frame")
+tabFrame.Size = UDim2.new(1, 0, 0, 40)
+tabFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+tabFrame.Parent = frame
+
+-- Eggs Tab Button
+local eggsTabBtn = Instance.new("TextButton")
+eggsTabBtn.Size = UDim2.new(1, 0, 1, 0)
+eggsTabBtn.Text = "Eggs"
+eggsTabBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+eggsTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+eggsTabBtn.Parent = tabFrame
+
+-- Eggs Frame
+local eggsFrame = Instance.new("Frame")
+eggsFrame.Size = UDim2.new(1, 0, 1, -40)
+eggsFrame.Position = UDim2.new(0, 0, 0, 40)
+eggsFrame.BackgroundTransparency = 1
+eggsFrame.Parent = frame
+
+-- Fast Hatch Button
+local fastHatchBtn = Instance.new("TextButton")
+fastHatchBtn.Size = UDim2.new(0.7, -5, 0, 50)
+fastHatchBtn.Position = UDim2.new(0.15, 0, 0.2, 0)
+fastHatchBtn.Text = "Fast Hatch: OFF"
+fastHatchBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+fastHatchBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+fastHatchBtn.Parent = eggsFrame
+
+local isFastHatching = false
+
+-- Function to simulate clicks
+local function simulateClick()
+    VirtualUser:Button1Down(Vector2.new(0, 0))
+    task.wait(0.01) -- Small delay before releasing
+    VirtualUser:Button1Up(Vector2.new(0, 0))
+end
+
+-- Clicking loop
+local function fastHatchLoop()
+    while isFastHatching do
+        simulateClick()
+        task.wait(0.002) -- 50 clicks per second (1/50)
+    end
+end
+
+-- Toggle Fast Hatch
+fastHatchBtn.MouseButton1Click:Connect(function()
+    isFastHatching = not isFastHatching
+    fastHatchBtn.Text = isFastHatching and "Fast Hatch: ON" or "Fast Hatch: OFF"
+    
+    if isFastHatching then
+        task.spawn(fastHatchLoop)
+    end
+end)
